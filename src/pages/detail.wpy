@@ -15,9 +15,13 @@
         </view>  
       </view>
       <view class="detail-part">
-        <text class="iconfont icon-zhifu"></text>
+        <text class="iconfont icon-sponsor"></text>
         <view class="detail-info">{{money}}万现金存款证明</view>
       </view>
+    </view>
+    <view class="navto" bindtap="goto">
+      <view class="navicon"><text class="iconfont icon-location_light"></text></view>
+      <view class="navtext">导航</view>
     </view>
   </view>
 </template>
@@ -37,7 +41,7 @@ export default class Profile extends wepy.page {
     average_price: '',
     starttime: '',
     endtime: '',
-
+    locate:''
   }
   onLoad (option) {
     var id = option.id
@@ -55,11 +59,21 @@ export default class Profile extends wepy.page {
         that.housenum = data.housenum
         that.nohouse = data.nohouse
         that.area = data.area
+        that.locate = data.coordinate
         that.average_price = data.average_price
         that.starttime = data.starttime
         that.endtime = data.endtime
         that.$apply()
       }
+    })
+  }
+  goto(){
+    var location = this.locate.split(',')
+    wx.openLocation({
+      latitude: location[1] - 0,
+      name: this.title,
+      longitude: location[0] - 0,
+      scale: 18
     })
   }
 }
@@ -75,7 +89,7 @@ export default class Profile extends wepy.page {
   }
   .detail-title{
     border-bottom:1px solid #e9e9e9;
-    padding-bottom: 2px;
+    padding-bottom: 5px;
     font-size:18px;
   }
   .detail-part{
@@ -98,5 +112,24 @@ export default class Profile extends wepy.page {
   }
   .detail-info{
     margin-left: 25px;
+  }
+  .navto{
+    width:40px;
+    margin:20px auto;
+  }
+  .navicon{
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align:center;
+    border-radius:50%;
+    color: #fc7272;
+    font-size:18px!important;
+    border: 1px solid #fc7272;
+  }
+  .navtext{
+    font-size: 14px;
+    padding-top: 5px;
+    text-align: center;
   }
 </style>
