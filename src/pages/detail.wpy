@@ -4,14 +4,14 @@
       <view class="detail-title">{{title}}</view>
       <view class="detail-part">
         <text class="iconfont icon-naozhong"></text>
-        <view class="detail-info">{{starttime}}至{{endtime}}</view>
+        <view class="detail-info">{{starttime}} 至 {{endtime}} 意向登记</view>
       </view>
       <view class="detail-part">
         <text class="iconfont icon-fangzi"></text>
         <view class="detail-info">
-          <view>房源面积{{area}}，</view>
-          <view>均价{{average_price}}元，</view>
-          <view>房源数{{housenum}}套，无房家庭倾斜{{nohouse}}%</view>
+          <view>面积：{{area}}</view>
+          <view>数量：{{housenum}}套，无房家庭倾斜{{nohouse}}%</view>
+          <view>均价：{{average_price}}元</view>
         </view>  
       </view>
       <view class="detail-part">
@@ -85,7 +85,8 @@ export default class Profile extends wepy.page {
   .detail-container{
     padding: 15px;
     border:1px solid #e9e9e9;
-    border-radius:3px;
+    border-radius:5px;
+    box-shadow: 0 0 3px rgba(0,0,0,.1)
   }
   .detail-title{
     border-bottom:1px solid #e9e9e9;
@@ -115,7 +116,7 @@ export default class Profile extends wepy.page {
   }
   .navto{
     width:40px;
-    margin:20px auto;
+    margin:30px auto;
   }
   .navicon{
     width: 40px;
@@ -124,8 +125,10 @@ export default class Profile extends wepy.page {
     text-align:center;
     border-radius:50%;
     color: #fc7272;
-    font-size:18px!important;
     border: 1px solid #fc7272;
+  }
+  .navicon .iconfont{
+    font-size: 22px;
   }
   .navtext{
     font-size: 14px;

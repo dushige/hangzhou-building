@@ -20,7 +20,6 @@
     methods = {
       locateTo(e){
         var index = e.currentTarget.id
-        console.log(index)
         this.$emit('locate', index)
       }
     }

@@ -2,7 +2,7 @@
   <view class="container">
     <!-- 地图 -->
     <view class="content hide {{currentTabIndex == '0' ? 'active' : ''}}">
-      <map id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="markertap" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
+      <map id="map" wx:if="{{isready}}" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="markertap" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
     </view>
 
     <!-- 列表 -->
@@ -35,13 +35,14 @@
       list: List
     }
     data = {
+      isready: false,
       currentTabIndex: 0,
       selected: 'hotel',
       markers: [],
       resList: [],
-      longitude: '',
-      latitude: '',
-      scale: ''
+      longitude: 120.097046,
+      latitude: 30.305318,
+      scale: 12
     }
     onLoad() {
       var that = this
@@ -88,9 +89,10 @@
         
         that.markers = marker_new
         that.resList = list_new
-        that.longitude = '120.097046'
-        that.latitude = '30.305318'
-        that.scale = 13
+        that.longitude = 120.097046
+        that.latitude = 30.305318
+        that.scale = 12
+        that.isready = true
         that.$apply()
       })
     }
@@ -117,9 +119,8 @@
         this.currentTabIndex = 0
       
         var lnglatarr = lnglat.split(',')
-        console.log(lnglatarr)
-        this.longitude = lnglatarr[0]
-        this.latitude = lnglatarr[1]
+        this.longitude = lnglatarr[0] - 0
+        this.latitude = lnglatarr[1] - 0
         //this.scale = 18
         this.$apply()
       }
