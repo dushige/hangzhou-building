@@ -117,11 +117,10 @@
       },
       'locate': (lnglat) => {
         this.currentTabIndex = 0
-      
         var lnglatarr = lnglat.split(',')
         this.longitude = lnglatarr[0] - 0
         this.latitude = lnglatarr[1] - 0
-        //this.scale = 18
+        // this.scale = 14
         this.$apply()
       }
     }
