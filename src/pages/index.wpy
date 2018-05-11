@@ -60,14 +60,13 @@
         var list_new = []
         data.forEach((val) => {
           var lnglat = val.coordinate.split(',')
-          let iconInfo = {
+          var iconInfo = {
             id: val.id,
-            latitude: lnglat[1],
-            longitude: lnglat[0],
+            latitude: parseFloat(lnglat[1]),
+            longitude: parseFloat(lnglat[0]),
             width: 33,
             height: 33,
             title: val.building,
-            iconPath: "/resources/mark.png",
             callout:{
               content: val.building,
               display: 'ALWAYS',
@@ -79,7 +78,12 @@
             },
             anchor:{x:.5,y:1}
           }
-          
+          var price = val.average_price.slice(0,5)
+          if(price > 22000){
+            iconInfo.iconPath = "/resources/mark.png"
+          } else {
+            iconInfo.iconPath = "/resources/blue.png"
+          }
           marker_new.push(iconInfo)
           list_new.push({
             name: val.building,
@@ -118,8 +122,8 @@
       'locate': (lnglat) => {
         this.currentTabIndex = 0
         var lnglatarr = lnglat.split(',')
-        this.longitude = lnglatarr[0] - 0
-        this.latitude = lnglatarr[1] - 0
+        this.longitude = parseFloat(lnglatarr[0])
+        this.latitude = parseFloat(lnglatarr[1])
         // this.scale = 14
         this.$apply()
       }
