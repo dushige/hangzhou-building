@@ -55,7 +55,6 @@
           },
           method: 'POST',
           success: function(res){
-            console.log(res)
             resolve(res.data.data)
           }
         })
