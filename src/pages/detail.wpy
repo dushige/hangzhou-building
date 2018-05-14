@@ -41,7 +41,8 @@ export default class Profile extends wepy.page {
     average_price: '',
     starttime: '',
     endtime: '',
-    locate:''
+    locate:'',
+    other: ''
   }
   onLoad (option) {
     var id = option.id
@@ -61,11 +62,22 @@ export default class Profile extends wepy.page {
         that.area = data.area
         that.locate = data.coordinate
         that.average_price = data.average_price
-        that.starttime = data.starttime
-        that.endtime = data.endtime
+        that.starttime = that.toLocaleDate(data.starttime)
+        that.endtime = that.toLocaleDate(data.endtime)
         that.$apply()
       }
     })
+  }
+  toLocaleDate(UTCDateString){
+    function formatFunc(str) {    //格式化显示
+      return str > 9 ? str : '0' + str
+    }
+    var date = new Date(UTCDateString)
+    var year = date.getFullYear();
+    var mon = formatFunc(date.getMonth() + 1);
+    var day = formatFunc(date.getDate())
+    var newdate = year + '-' + mon + '-' + day
+    return newdate
   }
   goto(){
     var location = this.locate.split(',')
@@ -79,60 +91,60 @@ export default class Profile extends wepy.page {
 }
 </script>
 <style>
-  .detail{
-    padding: 15px;
-  }
-  .detail-container{
-    padding: 15px;
-    border:1px solid #e9e9e9;
-    border-radius:5px;
-    box-shadow: 0 0 3px rgba(0,0,0,.1)
-  }
-  .detail-title{
-    border-bottom:1px solid #e9e9e9;
-    padding-bottom: 5px;
-    font-size:18px;
-  }
-  .detail-part{
-    font-size:16px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    border-bottom:1px solid #e9e9e9;
-  }
-  .detail-part:last-child{
-    border-bottom:none;
-    padding-bottom: 0;
-  }
-  .detail-part{
-    display: block;
-    line-height: 32px;
-  }
-  .detail-part .iconfont{
-    float: left;
-    margin-right: 8px;
-  }
-  .detail-info{
-    margin-left: 25px;
-  }
-  .navto{
-    width:40px;
-    margin:30px auto;
-  }
-  .navicon{
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align:center;
-    border-radius:50%;
-    color: #fc7272;
-    border: 1px solid #fc7272;
-  }
-  .navicon .iconfont{
-    font-size: 22px;
-  }
-  .navtext{
-    font-size: 14px;
-    padding-top: 5px;
-    text-align: center;
-  }
+.detail {
+  padding: 15px;
+}
+.detail-container {
+  padding: 15px;
+  border: 1px solid #e9e9e9;
+  border-radius: 5px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+}
+.detail-title {
+  border-bottom: 1px solid #e9e9e9;
+  padding-bottom: 5px;
+  font-size: 18px;
+}
+.detail-part {
+  font-size: 16px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e9e9e9;
+}
+.detail-part:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.detail-part {
+  display: block;
+  line-height: 32px;
+}
+.detail-part .iconfont {
+  float: left;
+  margin-right: 8px;
+}
+.detail-info {
+  margin-left: 25px;
+}
+.navto {
+  width: 40px;
+  margin: 30px auto;
+}
+.navicon {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  color: #fc7272;
+  border: 1px solid #fc7272;
+}
+.navicon .iconfont {
+  font-size: 22px;
+}
+.navtext {
+  font-size: 14px;
+  padding-top: 5px;
+  text-align: center;
+}
 </style>
