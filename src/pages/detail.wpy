@@ -10,8 +10,8 @@
       <view class="detail-part">
         <text class="iconfont icon-home"></text>
         <view class="detail-info">
-          <view>户型：{{area}}</view>
           <view>数量：{{housenum}}套，无房家庭倾斜{{nohouse}}%</view>
+          <view>户型：{{area}}</view>
           <view>均价：{{average_price}}元</view>
           <view>装修：{{fixtures}}</view>
         </view>
