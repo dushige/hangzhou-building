@@ -13,10 +13,10 @@
     <!-- 底部栏 -->
     <view class="selectarea">
       <view class="nav-left {{currentTabIndex == '1' ? 'active' : ''}}" id="0" bindtap="changeTab">
-        <text class="iconfont icon-dibiao"></text>地图
+        <text class="iconfont icon-location"></text>地图
       </view>
       <view class="nav-left {{currentTabIndex == '0' ? 'active' : ''}}" id="1" bindtap="changeTab">
-        <text class="iconfont icon-liebiao"></text>列表
+        <text class="iconfont icon-list"></text>列表
       </view>
     </view>
   </view>
@@ -80,14 +80,10 @@
               color: "#333333",
               fontSize: 12
             },
+            iconPath: "/resources/mark.png",
             anchor:{x:.5,y:1}
           }
-          var price = val.average_price.slice(0,5)
-          if(price > 22000){
-            iconInfo.iconPath = "/resources/mark.png"
-          } else {
-            iconInfo.iconPath = "/resources/blue.png"
-          }
+          
           marker_new.push(iconInfo)
           list_new.push({
             name: val.building,
@@ -120,6 +116,20 @@
                 + " " + date.getHours() + seperator2 + date.getMinutes()
                 + seperator2 + date.getSeconds();
         return currentdate;
+    }
+    toLocaleDate(UTCDateString){
+      function formatFunc(str) {    //格式化显示
+        return str > 9 ? str : '0' + str
+      }
+      var date = new Date(UTCDateString)
+      var year = date.getFullYear();
+      var mon = formatFunc(date.getMonth() + 1);
+      var day = formatFunc(date.getDate())
+      var hour = formatFunc(date.getHours());
+      var min = formatFunc(date.getMinutes());
+      var newdate = year + '-' + mon + '-' + day + ' ' + hour + ':' + min
+
+      return newdate
     }
     changeTab(e){
       var index = e.currentTarget.id
