@@ -11,9 +11,9 @@ export default class extends wepy.app {
     ],
     window: {
       backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#fff',
+      navigationBarBackgroundColor: '#78e08f',
       navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      navigationBarTextStyle: 'light'
     }
   }
 
@@ -44,8 +44,30 @@ html,body,page{
   left: 0;
   top: 0;
   right: 0;
-  bottom:50px;
+  bottom:80px;
 }
+
+.selectarea{
+  height:80px;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  font-size: 15px;
+  overflow:hidden;
+  white-space:nowrap;
+  background: #fff;
+}
+// .selectarea{
+//   height:50px;
+//   position: fixed;
+//   width: 100%;
+//   display: flex;
+//   left: 0;
+//   bottom: 0;
+//   font-size: 15px;
+//   background: #fff
+// }
 .container {
   height: 100%;
   display: flex;
@@ -88,16 +110,6 @@ html,body,page{
 
 .icon-text:before { content: "\e791"; }
 
-.selectarea{
-  height:50px;
-  position: fixed;
-  width: 100%;
-  display: flex;
-  left: 0;
-  bottom: 0;
-  font-size: 15px;
-  background: #fff
-}
 .nav-left{
   width: 50%;
   line-height: 50px;
