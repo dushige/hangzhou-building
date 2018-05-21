@@ -2,7 +2,7 @@
   <scroll-view class="content-scroll">
     <ul class="reslist">
       <repeat for="{{resList}}" key="index" index="index" item="item">
-        <li id="{{item.lnglat}}" bindtap="locateTo">{{item.name}}</li>
+        <li id="{{item.id}}" bindtap="locateTo">{{item.name}}</li>
       </repeat>
     </ul>
   </scroll-view>
@@ -20,7 +20,9 @@
     methods = {
       locateTo(e){
         var index = e.currentTarget.id
-        this.$emit('locate', index)
+        wx.navigateTo({
+          url: '/pages/detail?id=' + index
+        })
       }
     }
   }  

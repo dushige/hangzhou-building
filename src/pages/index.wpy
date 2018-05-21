@@ -87,7 +87,7 @@
           marker_new.push(iconInfo)
           list_new.push({
             name: val.building,
-            lnglat: val.coordinate
+            id: val.id
           })
         })
         
