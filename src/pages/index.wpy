@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <!-- 地图 -->
-    <view class="content hide {{currentTabIndex == '0' ? 'active' : ''}}">
+    <view class="content">
       <map id="map" wx:if="{{isready}}" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="markertap" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
     </view>
 
@@ -9,8 +9,8 @@
     <view class="selectarea">
       <scroll-view class="scroll-view_H" scroll-x style="width: 100%;height:100px">
         <repeat for="{{resList}}" key="index" index="index" item="item">
-          <view class="scroll-view-item_H" bindtap="locateTo" id="{{item.lnglat}}">
-            <view class="item-num {{currentTabIndex == '1' ? 'active' : ''}}">{{index + 1}}</view>
+          <view class="scroll-view-item_H  {{houseid == item.id ? 'active' : ''}}" bindtap="locateTo" id="{{item.id}}">
+            <view class="item-num">{{index + 1}}</view>
             <view class="item-name">{{item.name}}</view>
           </view>
         </repeat>
@@ -26,14 +26,14 @@
   import host from '../config.js'
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: '杭州购房摇号小助手'
+      navigationBarTitleText: '杭州商品住房摇号查询'
     }
     components = {
       list: List
     }
     data = {
       isready: false,
-      currentTabIndex: 0,
+      houseid: 0,
       markers: [],
       resList: [],
       longitude: 120.097046,
@@ -85,6 +85,7 @@
           
           marker_new.push(iconInfo)
           list_new.push({
+            id: val.id,
             name: val.building,
             lnglat: val.coordinate
           })
@@ -141,10 +142,11 @@
       })
     }
     locateTo(e){
-      var lnglat = e.currentTarget.id
-      var lnglatarr = lnglat.split(',')
-      this.longitude = parseFloat(lnglatarr[0])
-      this.latitude = parseFloat(lnglatarr[1])
+      var id = e.currentTarget.id
+      this.houseid = id
+      var index = _.findIndex(this.markers,['id',id - 0])
+      this.longitude = this.markers[index].longitude
+      this.latitude = this.markers[index].latitude
       this.scale = 13
       this.$apply()
     }
@@ -204,6 +206,10 @@
   width:20px;
   height:1px;
   border-bottom: 1px dotted #78e08f;
+}
+.active .item-num{
+  background: #78e08f;
+  color: #fff
 }
 .scroll-view-item_H:last-child .item-num::after{
   display: none;
