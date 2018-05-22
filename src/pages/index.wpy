@@ -5,17 +5,12 @@
       <map id="map" wx:if="{{isready}}" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" bindcallouttap="markertap" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
     </view>
 
-    <!-- 列表 -->
-    <view class="content hide {{currentTabIndex == '1' ? 'active' : ''}}">
-      <list :resList.sync="resList"></list>
-    </view>
-
     <!-- 底部栏 -->
     <view class="selectarea">
       <scroll-view class="scroll-view_H" scroll-x style="width: 100%;height:100px">
         <repeat for="{{resList}}" key="index" index="index" item="item">
           <view class="scroll-view-item_H" bindtap="locateTo" id="{{item.lnglat}}">
-            <view class="item-num">{{index + 1}}</view>
+            <view class="item-num {{currentTabIndex == '1' ? 'active' : ''}}">{{index + 1}}</view>
             <view class="item-name">{{item.name}}</view>
           </view>
         </repeat>
@@ -46,6 +41,9 @@
       scale: 12
     }
     onLoad() {
+      this.init()
+    }
+    init() {
       var that = this
       var date = this.getNowFormatDate()
       return new Promise((resolve,reject) => {
@@ -88,15 +86,12 @@
           marker_new.push(iconInfo)
           list_new.push({
             name: val.building,
-            lnglat: val.lnglat
+            lnglat: val.coordinate
           })
         })
         
         that.markers = marker_new
         that.resList = list_new
-        that.longitude = 120.097046
-        that.latitude = 30.305318
-        that.scale = 12
         that.isready = true
         that.$apply()
       })
@@ -146,10 +141,12 @@
       })
     }
     locateTo(e){
-      var index = e.currentTarget.id
-      wx.navigateTo({
-        url: '/pages/detail?id=' + index
-      })
+      var lnglat = e.currentTarget.id
+      var lnglatarr = lnglat.split(',')
+      this.longitude = parseFloat(lnglatarr[0])
+      this.latitude = parseFloat(lnglatarr[1])
+      this.scale = 13
+      this.$apply()
     }
     events = {
       'reGet': (p1,$event) => {
@@ -184,10 +181,11 @@
 }
 .scroll-view-item_H{
   padding: 13px 5px;
-  width:80px;
+  width:60px;
   display: inline-block;
 }
 .item-num{
+  position: relative;
   margin:0 auto;
   width:30px;
   height:30px;
@@ -197,12 +195,25 @@
   border-radius:50%;
   font-size:14px;
 }
+.item-num:after{
+  content: '';
+  display: inline-block;
+  position: absolute;
+  right:-30px;
+  top:13px;
+  width:20px;
+  height:1px;
+  border-bottom: 1px dotted #78e08f;
+}
+.scroll-view-item_H:last-child .item-num::after{
+  display: none;
+}
 .item-name{
-  width:70px;
+  width:60px;
   height: 40px;
   font-size: 12px;
   text-align: center;
-  padding-top: 5px;
+  padding-top: 8px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap
