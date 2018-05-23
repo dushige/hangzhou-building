@@ -147,7 +147,7 @@
       var index = _.findIndex(this.markers,['id',id - 0])
       this.longitude = this.markers[index].longitude
       this.latitude = this.markers[index].latitude
-      this.scale = 13
+      this.scale = 14
       this.$apply()
     }
 
@@ -177,13 +177,26 @@
 
     // 条件筛选
     handlecondition(e){
+      var that = this
       wx.showActionSheet({
-        itemList: ['默认排序', '均价低到高排序'],
+        itemList: ['默认排序', '均价排序'],
         success: function(res) {
           if(res.tapIndex == 1) {
-            console.log('hhh')
+            wx.showToast({
+              title: '切换为均价排序'
+            })
+            that.getHouseInfo('price')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
           } else if(res.tapIndex == 0){
-            console.log('ppp')
+            wx.showToast({
+              title: '切换为时间排序'
+            })
+            that.getHouseInfo('id')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
           }
         },
         fail: function(res) {
