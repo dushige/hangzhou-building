@@ -51,6 +51,7 @@ export default class Profile extends wepy.page {
     other: '无',
     fixtures: ''
   }
+  // 加载页面信息
   onLoad (option) {
     var id = option.id
     var that = this
@@ -79,6 +80,8 @@ export default class Profile extends wepy.page {
       }
     })
   }
+
+  // UTC时间转为本地时间
   toLocaleDate(UTCDateString){
     function formatFunc(str) {    //格式化显示
       return str > 9 ? str : '0' + str
@@ -93,6 +96,8 @@ export default class Profile extends wepy.page {
 
     return newdate
   }
+
+  // 导航
   goto(){
     var location = this.locate.split(',')
     wx.openLocation({

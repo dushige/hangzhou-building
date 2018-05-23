@@ -1,0 +1,51 @@
+<template>
+  <picker class="selector" bindchange="bindPickerChange" value="{{index}}" range-key="name" range="{{condition}}">
+    <view class="picker">
+        {{condition[index].name}}<text class="iconfont icon-xialajiantouxiao"></text>
+    </view>
+  </picker>
+</template>
+<script>
+import wepy from 'wepy';
+export default class Select extends wepy.component {
+  data = {
+    index: 0,
+    condition: [
+      {
+        id: 0,
+        short: 'all',
+        name: '最后更新'
+      },
+      {
+        id: 1,
+        short: 'hotel',
+        name: '按均价'
+      }
+    ]
+  };
+  methods = {
+    bindPickerChange(e) {
+      this.index = e.detail.value;
+    //   this.$emit('reGet',this.condition[this.index].short)
+      this.$apply();
+    }
+  };
+}
+</script>
+<style>
+.selector{
+    width:120px;
+    height:30px;
+    line-height: 30px;
+    font-size: 14px;
+    margin:0 auto;
+    text-align: center;
+    border-radius:4px;
+    color:#78e08f;
+    border:1px solid #78e08f;
+}
+.icon-xialajiantouxiao{
+  margin-left: 5px;
+  font-size:14px;
+}
+</style>
