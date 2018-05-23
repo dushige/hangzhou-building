@@ -67,19 +67,28 @@
             id: val.id,
             latitude: parseFloat(lnglat[1]),
             longitude: parseFloat(lnglat[0]),
-            width: 33,
-            height: 33,
-            title: val.building,
-            callout:{
+            width: 25,
+            height: 29,
+            //title: val.building,
+            // callout:{
+            //   content: val.building,
+            //   display: 'ALWAYS',
+            //   padding: 5,
+            //   borderRadius: 50,
+            //   bgColor: "#ffffff",
+            //   color: "#333333",
+            //   fontSize: 12
+            // },
+            label:{
               content: val.building,
-              display: 'ALWAYS',
-              padding: 5,
-              borderRadius: 50,
+              padding: 8,
+              color:"#333333",
+              fontSize:12,
               bgColor: "#ffffff",
-              color: "#333333",
-              fontSize: 12
+              x:18,
+              y:-18
             },
-            iconPath: "/resources/mark.png",
+            iconPath: "/resources/house.png",
             anchor:{x:.5,y:1}
           }
           
