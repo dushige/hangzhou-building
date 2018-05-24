@@ -183,7 +183,7 @@
         success: function(res) {
           if(res.tapIndex == 1) {
             wx.showToast({
-              title: '切换为均价排序'
+              title: '按均价排序'
             })
             that.getHouseInfo('price')
             setTimeout(() => {
@@ -191,7 +191,7 @@
             }, 1500);
           } else if(res.tapIndex == 0){
             wx.showToast({
-              title: '切换为时间排序'
+              title: '按更新时间排序'
             })
             that.getHouseInfo('id')
             setTimeout(() => {
