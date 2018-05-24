@@ -3,27 +3,64 @@
     <view class="detail-container">
       <view class="detail-title">{{title}}</view>
       <view class="detail-part">
-        <text class="iconfont icon-home"></text>
-        <view class="detail-info">
-          <view>数量：{{housenum}}套，无房家庭倾斜{{nohouse}}%</view>
-          <view>户型：{{area}}</view>
-          <view>均价：{{average_price}}元</view>
-          <view>装修：{{fixtures}}</view>
-        </view>
-      </view>
-      <view class="detail-part">
         <text class="iconfont icon-remind"></text>
+        <view class="detail-info">
+          <view class="detail-info_label">登记：</view>
+          <view class="detail-info_text">{{checkin}}</view>
+        </view>
         <view class="detail-info">开始：{{starttime}}</view>
         <view class="detail-info">截止：{{endtime}}</view>
       </view>
       <view class="detail-part">
+        <text class="iconfont icon-home"></text>
+        <view class="detail-info">
+          <view>数量：{{housenum}}套，无房家庭倾斜{{nohouse}}%</view>
+        </view>
+        <view class="detail-info">
+          <view class="detail-info_label">户型：</view>
+          <view class="detail-info_text">
+            <repeat for="{{area}}" key="index" index="index" item="item">
+              <view class="bank-item">{{item}}</view>
+            </repeat>
+          </view>
+        </view>
+        <view class="detail-info">
+          <view class="detail-info_label">均价：</view>
+          <view class="detail-info_text">
+            <repeat for="{{average_price}}" key="index" index="index" item="item">
+              <view class="bank-item">{{item}}</view>
+            </repeat>
+          </view>
+        </view>
+        <view class="detail-info">
+          <view>装修：{{fixtures}}</view>
+        </view>
+      </view>
+      <view class="detail-part">
         <text class="iconfont icon-refund"></text>
-        <view class="detail-info">验资：{{money}}万</view>
-        <view class="detail-info">银行：{{bank}}</view>
+        <view class="detail-info">
+          <view class="detail-info_label">验资：</view>
+          <view class="detail-info_text">{{money}}</view>
+        </view>
+        <view class="detail-info">
+          <view class="detail-info_label">银行：</view>
+          <view class="detail-info_text">
+            <repeat for="{{bank}}" key="index" index="index" item="item">
+              <view class="bank-item">{{item}}</view>
+            </repeat>
+          </view>
+        </view>
+        <view class="detail-info">
+          <view class="detail-info_label">限制：</view>
+          <view class="detail-info_text">{{bank_rule}}</view>  
+        </view>
       </view>
       <view class="detail-part">
         <text class="iconfont icon-text"></text>
-        <view class="detail-info">备注：{{other}}</view>
+        <view class="detail-info">
+          <view class="detail-info_label">备注：</view>
+          <view class="detail-info_text">{{other}}</view>
+        </view>
       </view>
     </view>
     <view class="navto" bindtap="goto">
@@ -37,7 +74,7 @@ import wepy from 'wepy'
 import host from '../config.js'
 export default class Profile extends wepy.page {
   config = {
-    navigationBarTitleText: '楼盘详情'
+    navigationBarTitleText: '楼盘摇号信息摘要'
   }
   data = {
     title:'',
@@ -49,9 +86,11 @@ export default class Profile extends wepy.page {
     starttime: '',
     endtime: '',
     locate:'',
+    checkin: '售楼处登记',
     other: '无',
     fixtures: '',
-    bank:'任意银行'
+    bank: ['无指定银行'],
+    bank_rule: '无附加限制'
   }
   // 加载页面信息
   onLoad (option) {
@@ -65,22 +104,49 @@ export default class Profile extends wepy.page {
       },
       success: function (res) {
         var data = res.data.data[0]
+
+        // 房源信息
         that.title = data.building
-        that.money = data.money
+        that.locate = data.coordinate
         that.housenum = data.housenum
         that.nohouse = data.nohouse
-        that.area = data.area
-        that.locate = data.coordinate
-        that.average_price = data.average_price
+        var rowareaarr = data.area.split(';')
+        var areaarr = rowareaarr.map(val => {
+          return val.trim()
+        })
+        that.area = areaarr
+        var rowaveragearr = data.average_price.split(';')
+        var averagearr = rowaveragearr.map(val => {
+          return val.trim()
+        })
+        that.average_price = averagearr
+        that.fixtures = data.fixtures
+
+        // 日期
+        if(data.checkin){
+          that.checkin = data.checkin
+        } 
+        that.starttime = that.toLocaleDate(data.starttime)
+        that.endtime = that.toLocaleDate(data.endtime)
+
+        // 银行
+        that.money = data.money
+        if(data.bank){
+          var rowbankarr = data.bank.split(';')
+          var bankarr = rowbankarr.map(val => {
+            return val.trim()
+          })
+          that.bank = bankarr
+        }
+        if(data.bank_rule){
+          that.bank_rule = data.bank_rule
+        }
+
+        // 其他
         if(data.other){
           that.other = data.other
         }
-        if(data.bank){
-          that.bank = data.bank
-        }
-        that.fixtures = data.fixtures
-        that.starttime = that.toLocaleDate(data.starttime)
-        that.endtime = that.toLocaleDate(data.endtime)
+        
         that.$apply()
       }
     })
@@ -149,6 +215,20 @@ export default class Profile extends wepy.page {
 }
 .detail-info {
   margin-left: 25px;
+  overflow: hidden;
+  line-height: normal;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.detail-info_label{
+  float: left;
+  width:48px;
+}
+.detail-info_text{
+  margin-left: 48px;
+}
+.bank-item{
+  padding-bottom: 5px;
 }
 .navto {
   width: 40px;
