@@ -37,35 +37,26 @@
         </view>
       </view>
       <view class="detail-part">
-        <text class="iconfont icon-refund"></text>
+        <text class="iconfont icon-file"></text>
         <view class="detail-info">
-          <view class="detail-info_label">验资：</view>
+          <view class="detail-info_label">资料：</view>
+          <view class="detail-info_text">登记所需材料及验资方案详情，请核对官方微信公众号{{wechat}}</view>
+        </view>
+        <view class="detail-info">
+          <view class="detail-info_label">金额：</view>
           <view class="detail-info_text">{{money}}</view>
-        </view>
-        <view class="detail-info">
-          <view class="detail-info_label">银行：</view>
-          <view class="detail-info_text">
-            <repeat for="{{bank}}" key="index" index="index" item="item">
-              <view class="bank-item">{{item}}</view>
-            </repeat>
-          </view>
-        </view>
-        <view class="detail-info">
-          <view class="detail-info_label">限制：</view>
-          <view class="detail-info_text">{{bank_rule}}</view>  
-        </view>
-      </view>
-      <view class="detail-part">
-        <text class="iconfont icon-text"></text>
-        <view class="detail-info">
-          <view class="detail-info_label">备注：</view>
-          <view class="detail-info_text">{{other}}</view>
         </view>
       </view>
     </view>
-    <view class="navto" bindtap="goto">
-      <view class="navicon"><text class="iconfont icon-location"></text></view>
-      <view class="navtext">导航</view>
+    <view class="functional">
+      <view class="func-item" bindtap="goto">
+        <view class="navicon"><text class="iconfont icon-location_light"></text></view>
+        <view class="navtext">导航</view>
+      </view>
+      <view class="func-item" bindtap="phonecall" wx:if="{{telephone}}">
+        <view class="navicon"><text class="iconfont icon-phone_light"></text></view>
+        <view class="navtext">电话</view>
+      </view>
     </view>
   </view>
 </template>
@@ -89,6 +80,8 @@ export default class Profile extends wepy.page {
     checkin: '售楼处登记',
     other: '无',
     fixtures: '',
+    wechat: '',
+    telephone: '',
     bank: ['无指定银行'],
     bank_rule: '无附加限制'
   }
@@ -131,20 +124,12 @@ export default class Profile extends wepy.page {
 
         // 银行
         that.money = data.money
-        if(data.bank){
-          var rowbankarr = data.bank.split(';')
-          var bankarr = rowbankarr.map(val => {
-            return val.trim()
-          })
-          that.bank = bankarr
-        }
-        if(data.bank_rule){
-          that.bank_rule = data.bank_rule
+        if(data.wechat){
+          that.wechat = '："' + data.wechat + '"'
         }
 
-        // 其他
-        if(data.other){
-          that.other = data.other
+        if(data.telephone){
+          that.telephone = data.telephone
         }
         
         that.$apply()
@@ -176,6 +161,14 @@ export default class Profile extends wepy.page {
       name: this.title,
       longitude: location[0] - 0,
       scale: 18
+    })
+  }
+
+  // 热线
+  phonecall(){
+    var phonenum = this.telephone
+    wx.makePhoneCall({
+      phoneNumber: phonenum
     })
   }
 }
@@ -230,10 +223,17 @@ export default class Profile extends wepy.page {
 .bank-item{
   padding-bottom: 5px;
 }
-.navto {
-  width: 40px;
-  margin: 30px auto;
+
+.functional{
+  text-align: center;
 }
+
+.func-item{
+  padding: 20px 20px;
+  display: inline-block;
+  width:40px;
+}
+
 .navicon {
   width: 40px;
   height: 40px;
