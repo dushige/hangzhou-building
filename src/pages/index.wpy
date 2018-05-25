@@ -232,7 +232,7 @@
   height:30px;
   line-height: 30px;
   text-align: center;
-  border:1px solid #78e08f;
+  border:1px solid #62d79b;
   border-radius:50%;
   font-size:14px;
 }
@@ -244,10 +244,10 @@
   top:13px;
   width:20px;
   height:1px;
-  border-bottom: 1px dotted #78e08f;
+  border-bottom: 1px dotted #62d79b;
 }
 .active .item-num{
-  background: #78e08f;
+  background: #62d79b;
   color: #fff
 }
 .scroll-view-item_H:last-child .item-num::after{
