@@ -5,6 +5,7 @@ export default {
   service: {
       host,
       getBuildingUrl: `${host}/weapp/building`,
-      getBuildDetail: `${host}/weapp/buildingdetail`
+      getBuildDetail: `${host}/weapp/buildingdetail`,
+      getSubwayUrl: `${host}/weapp/subway`,
   }
 }
