@@ -2,7 +2,7 @@
   <view class="container">
     <!-- 地图 -->
     <view class="content">
-      <map id="map" wx:if="{{isready}}" polyline="{{subway}}" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="handlecondition" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
+      <map id="map" wx:if="{{isready}}" polyline="{{subway}}" circles="{{circles}}" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="handlecondition" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
     </view>
 
     <!-- 底部栏 -->
@@ -37,24 +37,8 @@
       scale: 12,
       controls: [],
       system: '',
-      subway:[{
-        points: [
-          {
-            longitude: 119.694843,
-            latitude: 30.201965
-          }, 
-          {
-            longitude: 119.706656,
-            latitude: 30.226293
-          },
-          {
-            longitude: 119.739668,
-            latitude: 30.243052
-          }
-        ],
-        color:"#2ed573",
-        width: 3
-      }]
+      subway:[],
+      circles: []
     }
     onLoad() {
       this.getHouseInfo('id')
@@ -125,13 +109,13 @@
         
         that.markers = marker_new
         that.resList = list_new
-        that.isready = true
         that.$apply()
       })
     }
 
     // 获取地铁信息
     getSubway(){
+      var that = this
       return new Promise((resolve,reject) => {
         wx.request({
           url: host.service.getSubwayUrl,
@@ -142,7 +126,26 @@
           }
         })
       }).then(res => {
-        console.log(res)
+        var lines = _.groupBy(res, function(item){
+          return item.num
+        })
+        _.forIn(lines,(value,key) => {
+          var newline = {}
+          var points = []
+          value.forEach((val) => {
+            points.push({longitude:val.longitude,latitude: val.latitude})
+            that.circles.push({latitude: val.latitude - 0,longitude:val.longitude - 0,color:"#000000AA",radius:80})
+          })
+          newline.points = points
+          newline.borderColor = '#FFFFFF88'
+          newline.color = '#27ae60AA'
+          newline.width = 2
+
+          this.subway.push(newline)        
+        })
+        that.isready = true
+        that.$apply()
+        console.log(this.circles)
       })
     }
 
