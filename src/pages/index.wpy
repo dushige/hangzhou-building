@@ -121,7 +121,6 @@
           url: host.service.getSubwayUrl,
           method: 'POST',
           success: function(res){
-            console.log(res)
             resolve(res.data.data)
           }
         })
@@ -132,20 +131,19 @@
         _.forIn(lines,(value,key) => {
           var newline = {}
           var points = []
+          var color = value[0].color
           value.forEach((val) => {
             points.push({longitude:val.longitude,latitude: val.latitude})
-            that.circles.push({latitude: val.latitude - 0,longitude:val.longitude - 0,color:"#000000AA",radius:80})
+            that.circles.push({latitude: val.latitude,longitude:val.longitude,color:color,fillColor:color,radius:80})
           })
           newline.points = points
-          newline.borderColor = '#FFFFFF88'
-          newline.color = '#27ae60AA'
+          newline.color = color
           newline.width = 2
 
           this.subway.push(newline)        
         })
         that.isready = true
         that.$apply()
-        console.log(this.circles)
       })
     }
 
