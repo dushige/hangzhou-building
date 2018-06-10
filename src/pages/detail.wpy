@@ -1,7 +1,10 @@
 <template>
   <view class="detail">
     <view class="detail-container">
-      <view class="detail-title">{{title}}</view>
+      <view class="detail-title">
+        <text>{{title}}</text>
+        <view class="jump" bindtap="officeldetail">查看楼盘公众号销售公示</view>
+      </view>
       <view class="detail-part">
         <text class="iconfont icon-remind"></text>
         <view class="detail-info">
@@ -65,7 +68,7 @@ import wepy from 'wepy'
 import host from '../config.js'
 export default class Profile extends wepy.page {
   config = {
-    navigationBarTitleText: '楼盘摇号信息摘要'
+    navigationBarTitleText: '楼盘摇号信息'
   }
   data = {
     title:'',
@@ -164,6 +167,15 @@ export default class Profile extends wepy.page {
     })
   }
 
+  officeldetail(){
+    // var index = _.findIndex(this.markers,['id',e.markerId])
+    // var tapedMarker = this.markers[index]
+    // var id = tapedMarker.id
+    wx.navigateTo({
+      url: '/pages/officel'
+    })
+  }
+
   // 热线
   phonecall(){
     var phonenum = this.telephone
@@ -250,5 +262,9 @@ export default class Profile extends wepy.page {
   font-size: 14px;
   padding-top: 5px;
   text-align: center;
+}
+.jump{
+  font-size:14px;
+  color:cornflowerblue
 }
 </style>
