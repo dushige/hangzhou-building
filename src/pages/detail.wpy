@@ -85,6 +85,7 @@ export default class Profile extends wepy.page {
     navigationBarTitleText: '楼盘摇号信息'
   }
   data = {
+    id: '',
     title:'',
     housenum: '',
     nohouse: '',
@@ -107,6 +108,7 @@ export default class Profile extends wepy.page {
   onLoad (option) {
     var id = option.id
     var that = this
+    that.id = id
     wx.request({
       url: host.service.getBuildDetail,
       method: 'POST',
@@ -117,6 +119,9 @@ export default class Profile extends wepy.page {
         var data = res.data.data[0]
         // 房源信息
         that.title = data.building
+        wx.setNavigationBarTitle({
+          title: data.building
+        })
         that.locate = data.coordinate
         that.housenum = data.housenum
         that.nohouse = data.nohouse
@@ -149,12 +154,19 @@ export default class Profile extends wepy.page {
         if(data.telephone){
           that.telephone = data.telephone
         }
-        
+        wx.showShareMenu()
         that.$apply()
       }
     })
   }
 
+  onShareAppMessage(){
+    return {
+      title: `${this.title}`+ '销售公示',
+      path:'/pages/detail?id='+ `${this.id}`
+    }
+  }
+  
   // UTC时间转为本地时间
   toLocaleDate(UTCDateString){
     function formatFunc(str) {    //格式化显示

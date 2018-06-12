@@ -45,6 +45,12 @@
       this.getSubway()
       this.getSystemInfo()
     }
+    onShareAppMessage(){
+      return {
+        title: '杭州商品住房摇号查询',
+        path:'/pages/index'
+      }
+    }
     // 根据条件获取房源信息
     getHouseInfo(type) {
       var that = this
@@ -109,6 +115,7 @@
         
         that.markers = marker_new
         that.resList = list_new
+        wx.showShareMenu()
         that.$apply()
       })
     }
