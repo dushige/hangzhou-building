@@ -9,9 +9,6 @@
         <swiper-item item-id="0" class="tabcontent-item">
           <view class="detail-wraper">
             <view class="detail-container">
-              <view class="detail-title">
-                <text>{{title}}</text>
-              </view>
               <view class="detail-part">
                 <text class="iconfont icon-remind"></text>
                 <view class="detail-info">
@@ -38,7 +35,7 @@
                   <view class="detail-info_label">均价：</view>
                   <view class="detail-info_text">
                     <repeat for="{{average_price}}" key="index" index="index" item="item">
-                      <view class="bank-item">{{item}}</view>
+                      <view class="bank-item">{{item}}元/㎡</view>
                     </repeat>
                   </view>
                 </view>
@@ -57,7 +54,7 @@
             <view class="functional">
               <view class="func-item" bindtap="goto">
                 <view class="navicon"><text class="iconfont icon-location_light"></text></view>
-                <view class="navtext">导航</view>
+                <view class="navtext">地图</view>
               </view>
               <view class="func-item" bindtap="phonecall" wx:if="{{telephone}}">
                 <view class="navicon"><text class="iconfont icon-phone_light"></text></view>
@@ -235,7 +232,7 @@ export default class Profile extends wepy.page {
   width: 100%;
   height: 28px;
   z-index: 3;
-  box-shadow: 0 0px 2px rgba(0, 0, 0, 0.1);
+  border-bottom:1px solid #f4f4f4;
 }
 .tabitem{
   display:inline-block;
@@ -274,12 +271,11 @@ export default class Profile extends wepy.page {
 }
 .detail-container {
   padding: 15px;
-  border: 1px solid #e9e9e9;
+  border: 1px solid #f4f4f4;
   border-radius: 5px;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
 }
 .detail-title {
-  border-bottom: 1px solid #e9e9e9;
+  border-bottom: 1px solid #f4f4f4;
   padding-bottom: 5px;
   font-size: 18px;
 }
@@ -287,7 +283,7 @@ export default class Profile extends wepy.page {
   font-size: 16px;
   padding-top: 5px;
   padding-bottom: 5px;
-  border-bottom: 1px solid #e9e9e9;
+  border-bottom: 1px solid #f4f4f4;
 }
 .detail-part:last-child {
   border-bottom: none;

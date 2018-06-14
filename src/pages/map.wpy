@@ -1,0 +1,334 @@
+<template>
+  <view class="content">
+    <map id="map" wx:if="{{isready}}" polyline="{{subway}}" circles="{{circles}}" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="handlecondition" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
+    <!-- 底部栏 -->
+    <view class="selectarea">
+      <scroll-view class="scroll-view_H" scroll-x style="width: 100%;height:100px">
+        <repeat for="{{resList}}" key="index" index="index" item="item">
+          <view class="scroll-view-item_H  {{houseid == item.id ? 'active' : ''}}" bindtap="locateTo" id="{{item.id}}">
+            <view class="item-num">{{index + 1}}</view>
+            <view class="item-name">{{item.name}}</view>
+          </view>
+        </repeat>
+      </scroll-view>
+    </view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+import _ from 'lodash'
+import host from '../config.js'
+export default class Profile extends wepy.page {
+  config = {
+    navigationBarTitleText: '杭州摇号地图'
+  }
+  data = {
+    isready: false,
+    houseid: 0,
+    resList: [],
+    markers: [],
+    longitude: 120.097046,
+    latitude: 30.305318,
+    scale: 12,
+    controls: [],
+    system: '',
+    subway:[],
+    circles: []
+  }
+  onLoad() {
+    this.getHouseInfo('id')
+    this.getSubway()
+    this.getSystemInfo()
+  }
+  onShareAppMessage(){
+    return {
+      title: '杭州商品住房摇号查询',
+      path:'/pages/index'
+    }
+  }
+  
+  // 根据条件获取房源信息
+  getHouseInfo(type) {
+    var that = this
+    var date = this.getNowFormatDate()
+    return new Promise((resolve,reject) => {
+      wx.request({
+        url: host.service.getBuildingUrl,
+        data: {
+          type: type,
+          date: date
+        },
+        method: 'POST',
+        success: function(res){
+          resolve(res.data.data)
+        }
+      })
+    }).then(res => {
+      var data = res
+      var marker_new = []
+      var list_new = []
+      data.forEach((val) => {
+        var lnglat = val.coordinate.split(',')
+        var iconInfo = {
+          id: val.id,
+          latitude: parseFloat(lnglat[1]),
+          longitude: parseFloat(lnglat[0]),
+          width: 25,
+          height: 29,
+          iconPath: "/resources/house.png",
+          anchor:{x:.5,y:1}
+        }
+
+        if(that.system == 'iOS'){
+          iconInfo.label= {
+            content: val.building,
+            padding: 5,
+            color:"#333333",
+            fontSize:12,
+            bgColor: "#ffffff",
+            x:13,
+            y:-17
+          }
+        } else {
+          iconInfo.label= {
+            content: val.building,
+            padding: 5,
+            color:"#333333",
+            fontSize:12,
+            bgColor: "#ffffff",
+            x:13,
+            y:-29
+          }
+        }
+        
+        marker_new.push(iconInfo)
+        list_new.push({
+          id: val.id,
+          name: val.building,
+          lnglat: val.coordinate
+        })
+      })
+      
+      that.markers = marker_new
+      that.resList = list_new
+      wx.showShareMenu()
+      that.$apply()
+    })
+  }
+
+  // 获取地铁信息
+  getSubway(){
+    var that = this
+    return new Promise((resolve,reject) => {
+      wx.request({
+        url: host.service.getSubwayUrl,
+        method: 'POST',
+        success: function(res){
+          resolve(res.data.data)
+        }
+      })
+    }).then(res => {
+      var lines = _.groupBy(res, function(item){
+        return item.num
+      })
+      _.forIn(lines,(value,key) => {
+        var newline = {}
+        var points = []
+        var color = value[0].color
+        value.forEach((val) => {
+          points.push({longitude:val.longitude,latitude: val.latitude})
+          that.circles.push({latitude: val.latitude,longitude:val.longitude,color:color,fillColor:color,radius:80})
+        })
+        newline.points = points
+        newline.color = color
+        newline.width = 1
+
+        this.subway.push(newline)        
+      })
+      that.isready = true
+      that.$apply()
+    })
+  }
+
+  // 获取当前时间
+  getNowFormatDate() {
+      var date = new Date();
+      var seperator1 = "-";
+      var seperator2 = ":";
+      var month = date.getMonth() + 1;
+      var strDate = date.getDate();
+      if (month >= 1 && month <= 9) {
+          month = "0" + month;
+      }
+      if (strDate >= 0 && strDate <= 9) {
+          strDate = "0" + strDate;
+      }
+      var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+              + " " + date.getHours() + seperator2 + date.getMinutes()
+              + seperator2 + date.getSeconds();
+      return currentdate;
+  }
+    
+  // 地图标记点击跳转到详情页
+  markertap(e) {
+    var index = _.findIndex(this.markers,['id',e.markerId])
+    var tapedMarker = this.markers[index]
+    var id = tapedMarker.id
+    wx.navigateTo({
+      url: '/pages/detail?id=' + id
+    })
+  }
+
+  // 地图中心点设置为指定的点
+  locateTo(e){
+    var id = e.currentTarget.id
+    this.houseid = id
+    var index = _.findIndex(this.markers,['id',id - 0])
+    this.longitude = this.markers[index].longitude
+    this.latitude = this.markers[index].latitude
+    this.scale = 14
+    this.$apply()
+  }
+
+  // 获取当前设备信息
+  getSystemInfo(){
+    var that = this
+    wx.getSystemInfo({
+      success: function(res) {
+        var top = res.windowHeight - 30 - 20 - 90 
+        that.controls = [{
+          id: 1,
+          iconPath: '/resources/filter.png',
+          position: {
+            left: 10,
+            top: top,
+            width: 40,
+            height: 40
+          },
+          clickable: true
+        },
+        {
+          id: 2,
+          iconPath: '/resources/subway.png',
+          position: {
+            left: 10,
+            top: 20,
+            width: 40,
+            height: 40
+          },
+          clickable: true
+        }
+        ]
+        var system = res.system.substring(0,3)
+        that.system = system
+        that.$apply()
+      }
+    })
+  }
+
+  // 条件筛选
+  handlecondition(e){
+    var id = e.controlId
+    var that = this
+
+    if(id == 1){
+      wx.showActionSheet({
+        itemList: ['默认排序', '均价排序', '房源数量排序'],
+        success: function(res) {
+          if(res.tapIndex == 1) {
+            wx.showToast({
+              title: '按均价排序'
+            })
+            that.getHouseInfo('price')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
+          } else if(res.tapIndex == 0){
+            wx.showToast({
+              title: '按更新时间排序'
+            })
+            that.getHouseInfo('id')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
+          } else if(res.tapIndex == 2){
+            wx.showToast({
+              title: '按房源数量排序'
+            })
+            that.getHouseInfo('housenum')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
+          }
+        },
+        fail: function(res) {
+          console.log(res.errMsg)
+        }
+      })
+    } else if(id == 2){
+      wx.showModal({
+        title:'提示',
+        content: '已绘制部分杭州在建地铁线路信息，供参考',
+        showCancel: false
+      })
+    }
+    
+  }
+}
+</script>
+<style>
+#map {
+  width: 100%;
+  height: 100%;
+}
+.scroll-view_H{
+   overflow:hidden;
+}
+.scroll-view-item_H{
+  padding: 13px 5px;
+  width:60px;
+  display: inline-block;
+}
+.item-num{
+  position: relative;
+  margin:0 auto;
+  width:30px;
+  height:30px;
+  line-height: 30px;
+  text-align: center;
+  border:1px solid #2ed573;
+  border-radius:50%;
+  font-size:14px;
+}
+.item-num:after{
+  content: '';
+  display: inline-block;
+  position: absolute;
+  right:-30px;
+  top:13px;
+  width:20px;
+  height:1px;
+  border-bottom: 1px dotted #2ed573;
+}
+.active .item-num{
+  background: #2ed573;
+  color: #fff
+}
+.scroll-view-item_H:last-child .item-num::after{
+  display: none;
+}
+.item-name{
+  width:60px;
+  height: 40px;
+  font-size: 12px;
+  text-align: center;
+  padding-top: 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap
+}
+.selector-container{
+  padding-top: 15px;
+  padding-bottom: 5px;
+}
+</style>
