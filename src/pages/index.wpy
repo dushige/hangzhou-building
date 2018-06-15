@@ -2,9 +2,8 @@
   <view class="container">
     <view class="topbar">
       <view class="topbar-container">
-        <view class="topbar-item">所有</view>
-        <view class="topbar-item">均价</view>
-        <view class="topbar-item topbar-item_right" bindtap="toMap">地图</view>
+        <view class="topbar-item" bindtap="order"><text class="iconfont icon-pailie"></text>排序</view>
+        <view class="topbar-item" bindtap="toMap"><text class="iconfont icon-ditu"></text>地图</view>
       </view>
     </view>
     <view class="contentlist">
@@ -92,6 +91,44 @@
         return currentdate;
     }
 
+    // 条件筛选
+  order(){
+    var that = this
+    wx.showActionSheet({
+        itemList: ['更新时间排序', '均价排序', '房源数量排序'],
+        success: function(res) {
+          if(res.tapIndex == 1) {
+            wx.showToast({
+              title: '按均价排序'
+            })
+            that.getHouseInfo('price')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
+          } else if(res.tapIndex == 0){
+            wx.showToast({
+              title: '按更新时间排序'
+            })
+            that.getHouseInfo('id')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
+          } else if(res.tapIndex == 2){
+            wx.showToast({
+              title: '按房源数量排序'
+            })
+            that.getHouseInfo('housenum')
+            setTimeout(() => {
+              wx.hideToast()
+            }, 1500);
+          }
+        },
+        fail: function(res) {
+          console.log(res.errMsg)
+        }
+      })
+  }
+
     // 跳转到地图
     toMap(){
       wx.navigateTo({
@@ -117,10 +154,12 @@
   padding: 15px 20px;
 }
 .topbar-item{
+  font-size:16px;
   float: left;
+  margin-right:20px;
 }
-.topbar-item_right{
-  float: right;
+.topbar-item .iconfont{
+  margin-right: 2px;
 }
 
 /* 内容列表 */

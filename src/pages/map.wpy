@@ -233,7 +233,7 @@ export default class Profile extends wepy.page {
 
     if(id == 1){
       wx.showActionSheet({
-        itemList: ['默认排序', '均价排序', '房源数量排序'],
+        itemList: ['更新时间排序', '均价排序', '房源数量排序'],
         success: function(res) {
           if(res.tapIndex == 1) {
             wx.showToast({
