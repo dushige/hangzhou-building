@@ -104,6 +104,7 @@ export default class Profile extends wepy.page {
         marker_new.push(iconInfo)
         list_new.push({
           id: val.id,
+          time: Date.parse(that.toLocaleDate(val.starttime)),
           name: val.building,
           lnglat: val.coordinate
         })
@@ -226,6 +227,22 @@ export default class Profile extends wepy.page {
     })
   }
 
+  // UTC时间转为本地时间
+    toLocaleDate(UTCDateString){
+      function formatFunc(str) {    //格式化显示
+        return str > 9 ? str : '0' + str
+      }
+      var date = new Date(UTCDateString)
+      var year = date.getFullYear();
+      var mon = formatFunc(date.getMonth() + 1);
+      var day = formatFunc(date.getDate())
+      var hour = formatFunc(date.getHours());
+      var min = formatFunc(date.getMinutes());
+      var newdate = year + '.' + mon + '.' + day + ' ' + hour + ':' + min
+
+      return newdate
+    }
+
   // 条件筛选
   handlecondition(e){
     var id = e.controlId
@@ -233,11 +250,11 @@ export default class Profile extends wepy.page {
 
     if(id == 1){
       wx.showActionSheet({
-        itemList: ['更新时间排序', '均价排序', '房源数量排序'],
+        itemList: ['登记日期排序', '均价排序'],
         success: function(res) {
           if(res.tapIndex == 1) {
             wx.showToast({
-              title: '按均价排序'
+              title: '均价排序'
             })
             that.getHouseInfo('price')
             setTimeout(() => {
@@ -245,17 +262,12 @@ export default class Profile extends wepy.page {
             }, 1500);
           } else if(res.tapIndex == 0){
             wx.showToast({
-              title: '按更新时间排序'
+              title: '登记日期排序'
             })
-            that.getHouseInfo('id')
-            setTimeout(() => {
-              wx.hideToast()
-            }, 1500);
-          } else if(res.tapIndex == 2){
-            wx.showToast({
-              title: '按房源数量排序'
-            })
-            that.getHouseInfo('housenum')
+            var list = that.resList
+            var list_new = _.orderBy(list, ['time'], ['asc'])
+            that.resList = list_new
+            that.$apply()
             setTimeout(() => {
               wx.hideToast()
             }, 1500);

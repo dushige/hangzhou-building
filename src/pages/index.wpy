@@ -17,9 +17,9 @@
     <view wx:if="{{init == 'list'}}">
       <view class="topbar">
         <view class="topbar-container">
-          <view class="topbar-item" bindtap="order"><text class="iconfont icon-pailie"></text>登记日期</view>
-          <view class="topbar-item" bindtap="order"><text class="iconfont icon-pailie"></text>均价</view>
-          <view class="topbar-item topbar-item_right" bindtap="toMap"><text class="iconfont icon-ditu"></text>地图模式</view>
+          <view class="topbar-item topbar-item_left {{choosenid == 1 ? 'choosen' : ''}}" bindtap="orderByTime">登记日期<text class="iconfont icon-triangledownfill"></text></view>
+          <view class="topbar-item topbar-item_left {{choosenid == 2 ? 'choosen' : ''}}" bindtap="orderByPrice">均价<text class="iconfont icon-triangledownfill"></text></view>
+          <view class="topbar-item topbar-item_right" bindtap="toMap"><text class="iconfont icon-locationfill"></text>地图模式</view>
         </view>
       </view>
       <view class="contentlist">
@@ -53,6 +53,7 @@
       controls: [],
       system: '',
       subway:[],
+      choosenid: 0,
       circles: []
     }
 
@@ -102,31 +103,35 @@
           anchor:{x:.5,y:1}
         }
 
-        if(that.system == 'iOS'){
-          iconInfo.label= {
-            content: val.building,
-            padding: 5,
-            color:"#333333",
-            fontSize:12,
-            bgColor: "#ffffff",
-            x:13,
-            y:-17
+          if(that.system == 'iOS'){
+            iconInfo.label= {
+              content: val.building,
+              padding: 5,
+              color:"#333333",
+              fontSize:12,
+              bgColor: "#ffffff",
+              x:13,
+              y:-17
+            }
+          } else {
+            iconInfo.label= {
+              content: val.building,
+              padding: 5,
+              color:"#333333",
+              fontSize:12,
+              bgColor: "#ffffff",
+              x:13,
+              y:-29
+            }
           }
-        } else {
-          iconInfo.label= {
-            content: val.building,
-            padding: 5,
-            color:"#333333",
-            fontSize:12,
-            bgColor: "#ffffff",
-            x:13,
-            y:-29
-          }
-        }
         
-        marker_new.push(iconInfo)
+          marker_new.push(iconInfo)
+        
           list_new.push({
             id: val.id,
+            time: Date.parse(that.toLocaleDate(val.starttime)),
+            starttime: that.toLocaleDate(val.starttime).substring(0,10),
+            endtime: that.toLocaleDate(val.endtime).substring(0,10),
             suolue: val.suolue,
             locate: val.locate,
             name: val.building,
@@ -176,47 +181,50 @@
     }
 
     // 条件筛选
-    order(){
-      var that = this
-      wx.showActionSheet({
-          itemList: ['更新时间排序', '均价排序', '房源数量排序'],
-          success: function(res) {
-            if(res.tapIndex == 1) {
-              wx.showToast({
-                title: '按均价排序'
-              })
-              that.getHouseInfo('price')
-              setTimeout(() => {
-                wx.hideToast()
-              }, 1500);
-            } else if(res.tapIndex == 0){
-              wx.showToast({
-                title: '按更新时间排序'
-              })
-              that.getHouseInfo('id')
-              setTimeout(() => {
-                wx.hideToast()
-              }, 1500);
-            } else if(res.tapIndex == 2){
-              wx.showToast({
-                title: '按房源数量排序'
-              })
-              that.getHouseInfo('housenum')
-              setTimeout(() => {
-                wx.hideToast()
-              }, 1500);
-            }
-          },
-          fail: function(res) {
-            console.log(res.errMsg)
-          }
-        })
+    orderByPrice(){
+      wx.showToast({
+        title: '均价排序'
+      })
+      this.getHouseInfo('price')
+      this.choosenid = 2
+      this.$apply()
+      setTimeout(() => {
+        wx.hideToast()
+      }, 1500)
+    }
+    orderByTime(){
+      wx.showToast({
+        title: '登记日期排序'
+      })
+      var list = this.resList
+      var list_new = _.orderBy(list, ['time'], ['asc'])
+      this.resList = list_new
+      this.choosenid = 1
+      this.$apply()
+      setTimeout(() => {
+        wx.hideToast()
+      }, 1500)
     }
     // 跳转到地图
     toMap(){
       wx.navigateTo({
         url: '/pages/map'
       })
+    }
+    // UTC时间转为本地时间
+    toLocaleDate(UTCDateString){
+      function formatFunc(str) {    //格式化显示
+        return str > 9 ? str : '0' + str
+      }
+      var date = new Date(UTCDateString)
+      var year = date.getFullYear();
+      var mon = formatFunc(date.getMonth() + 1);
+      var day = formatFunc(date.getDate())
+      var hour = formatFunc(date.getHours());
+      var min = formatFunc(date.getMinutes());
+      var newdate = year + '.' + mon + '.' + day + ' ' + hour + ':' + min
+
+      return newdate
     }
 
     // 获取地铁信息
@@ -373,12 +381,21 @@
   padding: 15px 20px;
 }
 .topbar-item{
-  font-size:16px;
+  font-size:14px;
   float: left;
   margin-right:20px;
 }
+.choosen.topbar-item{
+  color:#2ed573
+}
 .topbar-item .iconfont{
   margin-right: 2px;
+}
+.topbar-item_left .iconfont{
+  font-size:10px;
+  margin-left: 2px;
+  position: relative;
+  top:-2px
 }
 
 .topbar-item_right{
