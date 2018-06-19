@@ -1,13 +1,30 @@
 <template>
   <view class="container">
-    <view class="topbar">
-      <view class="topbar-container">
-        <view class="topbar-item" bindtap="order"><text class="iconfont icon-pailie"></text>排序</view>
-        <view class="topbar-item" bindtap="toMap"><text class="iconfont icon-ditu"></text>地图</view>
+    <view class="content" wx:if="{{init == 'map'}}">
+      <map id="map" wx:if="{{isready}}" polyline="{{subway}}" circles="{{circles}}" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" controls="{{controls}}" bindcontroltap="handlecondition" bindmarkertap="markertap" markers="{{markers}}" show-location></map>
+      <!-- 底部栏 -->
+      <view class="selectarea">
+        <scroll-view class="scroll-view_H" scroll-x style="width: 100%;height:100px">
+          <repeat for="{{resList}}" key="index" index="index" item="item">
+            <view class="scroll-view-item_H  {{houseid == item.id ? 'active' : ''}}" bindtap="locateTo" id="{{item.id}}">
+              <view class="item-num">{{index + 1}}</view>
+              <view class="item-name">{{item.name}}</view>
+            </view>
+          </repeat>
+        </scroll-view>
       </view>
     </view>
-    <view class="contentlist">
-      <list :resList.sync="resList"></list>
+    <view wx:if="{{init == 'list'}}">
+      <view class="topbar">
+        <view class="topbar-container">
+          <view class="topbar-item" bindtap="order"><text class="iconfont icon-pailie"></text>登记日期</view>
+          <view class="topbar-item" bindtap="order"><text class="iconfont icon-pailie"></text>均价</view>
+          <view class="topbar-item topbar-item_right" bindtap="toMap"><text class="iconfont icon-ditu"></text>地图模式</view>
+        </view>
+      </view>
+      <view class="contentlist">
+        <list :resList.sync="resList"></list>
+      </view>
     </view>
   </view>
 </template>
@@ -25,18 +42,35 @@
       list: List
     }
     data = {
-      resList: []
+      init: '',
+      isready: false,
+      houseid: 0,
+      resList: [],
+      markers: [],
+      longitude: 120.097046,
+      latitude: 30.305318,
+      scale: 12,
+      controls: [],
+      system: '',
+      subway:[],
+      circles: []
     }
+
     onLoad() {
+      this.getInitState()
       this.getHouseInfo('id')
+      this.getSubway()
+      this.getSystemInfo()
     }
+    // 设置分享信息
     onShareAppMessage(){
       return {
         title: '杭州商品住房摇号查询',
         path:'/pages/index'
       }
     }
-    // 根据条件获取房源信息
+
+    // 初始化数据
     getHouseInfo(type) {
       var that = this
       var date = this.getNowFormatDate()
@@ -54,8 +88,43 @@
         })
       }).then(res => {
         var data = res
+        var marker_new = []
         var list_new = []
         data.forEach((val) => {
+          var lnglat = val.coordinate.split(',')
+        var iconInfo = {
+          id: val.id,
+          latitude: parseFloat(lnglat[1]),
+          longitude: parseFloat(lnglat[0]),
+          width: 25,
+          height: 29,
+          iconPath: "/resources/house.png",
+          anchor:{x:.5,y:1}
+        }
+
+        if(that.system == 'iOS'){
+          iconInfo.label= {
+            content: val.building,
+            padding: 5,
+            color:"#333333",
+            fontSize:12,
+            bgColor: "#ffffff",
+            x:13,
+            y:-17
+          }
+        } else {
+          iconInfo.label= {
+            content: val.building,
+            padding: 5,
+            color:"#333333",
+            fontSize:12,
+            bgColor: "#ffffff",
+            x:13,
+            y:-29
+          }
+        }
+        
+        marker_new.push(iconInfo)
           list_new.push({
             id: val.id,
             suolue: val.suolue,
@@ -65,13 +134,12 @@
             lnglat: val.coordinate
           })
         })
-        
+        that.markers = marker_new
         that.resList = list_new
         wx.showShareMenu()
         that.$apply()
       })
     }
-
     // 获取当前时间
     getNowFormatDate() {
         var date = new Date();
@@ -90,50 +158,201 @@
                 + seperator2 + date.getSeconds();
         return currentdate;
     }
+    getInitState(){
+      var that = this
+      return new Promise((resolve,reject) => {
+        wx.request({
+          url: host.service.getInitUrl,
+          method: 'POST',
+          success: function(res){
+            resolve(res.data.data)
+          }
+        })
+      }).then(res => {
+        var path = res[0].path
+        that.init = path
+        that.$apply()
+      })
+    }
 
     // 条件筛选
-  order(){
-    var that = this
-    wx.showActionSheet({
-        itemList: ['更新时间排序', '均价排序', '房源数量排序'],
-        success: function(res) {
-          if(res.tapIndex == 1) {
-            wx.showToast({
-              title: '按均价排序'
-            })
-            that.getHouseInfo('price')
-            setTimeout(() => {
-              wx.hideToast()
-            }, 1500);
-          } else if(res.tapIndex == 0){
-            wx.showToast({
-              title: '按更新时间排序'
-            })
-            that.getHouseInfo('id')
-            setTimeout(() => {
-              wx.hideToast()
-            }, 1500);
-          } else if(res.tapIndex == 2){
-            wx.showToast({
-              title: '按房源数量排序'
-            })
-            that.getHouseInfo('housenum')
-            setTimeout(() => {
-              wx.hideToast()
-            }, 1500);
+    order(){
+      var that = this
+      wx.showActionSheet({
+          itemList: ['更新时间排序', '均价排序', '房源数量排序'],
+          success: function(res) {
+            if(res.tapIndex == 1) {
+              wx.showToast({
+                title: '按均价排序'
+              })
+              that.getHouseInfo('price')
+              setTimeout(() => {
+                wx.hideToast()
+              }, 1500);
+            } else if(res.tapIndex == 0){
+              wx.showToast({
+                title: '按更新时间排序'
+              })
+              that.getHouseInfo('id')
+              setTimeout(() => {
+                wx.hideToast()
+              }, 1500);
+            } else if(res.tapIndex == 2){
+              wx.showToast({
+                title: '按房源数量排序'
+              })
+              that.getHouseInfo('housenum')
+              setTimeout(() => {
+                wx.hideToast()
+              }, 1500);
+            }
+          },
+          fail: function(res) {
+            console.log(res.errMsg)
           }
-        },
-        fail: function(res) {
-          console.log(res.errMsg)
-        }
-      })
-  }
-
+        })
+    }
     // 跳转到地图
     toMap(){
       wx.navigateTo({
         url: '/pages/map'
       })
+    }
+
+    // 获取地铁信息
+    getSubway(){
+      var that = this
+      return new Promise((resolve,reject) => {
+        wx.request({
+          url: host.service.getSubwayUrl,
+          method: 'POST',
+          success: function(res){
+            resolve(res.data.data)
+          }
+        })
+      }).then(res => {
+        var lines = _.groupBy(res, function(item){
+          return item.num
+        })
+        _.forIn(lines,(value,key) => {
+          var newline = {}
+          var points = []
+          var color = value[0].color
+          value.forEach((val) => {
+            points.push({longitude:val.longitude,latitude: val.latitude})
+            that.circles.push({latitude: val.latitude,longitude:val.longitude,color:color,fillColor:color,radius:80})
+          })
+          newline.points = points
+          newline.color = color
+          newline.width = 1
+
+          this.subway.push(newline)        
+        })
+        that.isready = true
+        that.$apply()
+      })
+    }
+    // 地图中心点设置为指定的点
+    locateTo(e){
+      var id = e.currentTarget.id
+      this.houseid = id
+      var index = _.findIndex(this.markers,['id',id - 0])
+      this.longitude = this.markers[index].longitude
+      this.latitude = this.markers[index].latitude
+      this.scale = 14
+      this.$apply()
+    }
+    // 地图标记点击事件
+    markertap(e) {
+      var index = _.findIndex(this.markers,['id',e.markerId])
+      var tapedMarker = this.markers[index]
+      var id = tapedMarker.id
+      wx.navigateTo({
+        url: '/pages/detail?id=' + id
+      })
+    }
+    // 获取当前设备信息
+    getSystemInfo(){
+      var that = this
+      wx.getSystemInfo({
+        success: function(res) {
+          var top = res.windowHeight - 30 - 20 - 90 
+          that.controls = [{
+            id: 1,
+            iconPath: '/resources/filter.png',
+            position: {
+              left: 10,
+              top: top,
+              width: 40,
+              height: 40
+            },
+            clickable: true
+          },
+          {
+            id: 2,
+            iconPath: '/resources/subway.png',
+            position: {
+              left: 10,
+              top: 20,
+              width: 40,
+              height: 40
+            },
+            clickable: true
+          }
+          ]
+          var system = res.system.substring(0,3)
+          that.system = system
+          that.$apply()
+        }
+      })
+    }
+    // 地图控件点击事件
+    handlecondition(e){
+      var id = e.controlId
+      var that = this
+
+      if(id == 1){
+        wx.showActionSheet({
+          itemList: ['更新时间排序', '均价排序', '房源数量排序'],
+          success: function(res) {
+            if(res.tapIndex == 1) {
+              wx.showToast({
+                title: '按均价排序'
+              })
+              that.getHouseInfo('price')
+              setTimeout(() => {
+                wx.hideToast()
+              }, 1500);
+            } else if(res.tapIndex == 0){
+              wx.showToast({
+                title: '按更新时间排序'
+              })
+              that.getHouseInfo('id')
+              setTimeout(() => {
+                wx.hideToast()
+              }, 1500);
+            } else if(res.tapIndex == 2){
+              wx.showToast({
+                title: '按房源数量排序'
+              })
+              that.getHouseInfo('housenum')
+              setTimeout(() => {
+                wx.hideToast()
+              }, 1500);
+            }
+          },
+          fail: function(res) {
+            console.log(res.errMsg)
+          }
+        })
+      } else if(id == 2){
+        wx.showModal({
+          title:'提示',
+          content: '已绘制部分杭州在建地铁线路信息，供参考',
+          showCancel: false
+        })
+      }
+      
     }
   }  
 </script>
@@ -162,11 +381,70 @@
   margin-right: 2px;
 }
 
+.topbar-item_right{
+  float: right;
+  margin-right: 0;
+}
+
 /* 内容列表 */
 .contentlist{
   width: 100%;
   position: absolute;
   left: 0;
   top: 50px;
+}
+#map {
+  width: 100%;
+  height: 100%;
+}
+.scroll-view_H{
+   overflow:hidden;
+}
+.scroll-view-item_H{
+  padding: 13px 5px;
+  width:60px;
+  display: inline-block;
+}
+.item-num{
+  position: relative;
+  margin:0 auto;
+  width:30px;
+  height:30px;
+  line-height: 30px;
+  text-align: center;
+  border:1px solid #2ed573;
+  border-radius:50%;
+  font-size:14px;
+}
+.item-num:after{
+  content: '';
+  display: inline-block;
+  position: absolute;
+  right:-30px;
+  top:13px;
+  width:20px;
+  height:1px;
+  border-bottom: 1px dotted #2ed573;
+}
+.active .item-num{
+  background: #2ed573;
+  color: #fff
+}
+.scroll-view-item_H:last-child .item-num::after{
+  display: none;
+}
+.item-name{
+  width:60px;
+  height: 40px;
+  font-size: 12px;
+  text-align: center;
+  padding-top: 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap
+}
+.selector-container{
+  padding-top: 15px;
+  padding-bottom: 5px;
 }
 </style>

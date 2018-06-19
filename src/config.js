@@ -7,5 +7,6 @@ export default {
       getBuildingUrl: `${host}/weapp/building`,
       getBuildDetail: `${host}/weapp/buildingdetail`,
       getSubwayUrl: `${host}/weapp/subway`,
+      getInitUrl: `${host}/weapp/init`,
   }
 }
