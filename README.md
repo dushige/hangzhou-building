@@ -8,7 +8,7 @@
 - 地图展示房源位置等
 
 ## 扫码体验
-![image](https://github.com/kasa2010/HangzhouHouse/blob/master/src/resources/qr.jpg)
+![image](./src/resources/qr.jpg)
 
 ## 预览
 ### 首页
