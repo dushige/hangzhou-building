@@ -12,11 +12,11 @@
 
 ## 预览
 ### 首页
-![image](https://github.com/kasa2010/HangzhouHouse/blob/master/src/resources/list.png)
+![image](./src/resources/list.png)
 
 ### 详情页
-![image](https://github.com/kasa2010/HangzhouHouse/blob/master/src/resources/detail.png)
+![image](./src/resources/detail.png)
 
 ### 地图展示
-![image](https://github.com/kasa2010/HangzhouHouse/blob/master/src/resources/map.png)
+![image](./src/resources/map.png)
 
